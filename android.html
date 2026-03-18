@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tauri Android Guide: The True Dev Way</title>
+    <style>
+        :root { --bg: #1a1a2e; --surface: #16213e; --primary: #0f3460; --accent: #e94560; --text: #e0e0e0; }
+        body { font-family: system-ui, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 0; }
+        nav { background-color: var(--surface); padding: 1rem 2rem; border-bottom: 2px solid var(--accent); display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; font-size: 1.1rem; }
+        nav a:hover { color: var(--accent); }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 20px; }
+        h1, h2, h3 { color: #fff; }
+        h1 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .toc { background: var(--surface); padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .toc ul { list-style-type: none; padding-left: 0; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { color: var(--accent); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .code-wrapper { position: relative; background: #000; border-radius: 8px; margin: 15px 0; overflow: hidden; }
+        pre { margin: 0; padding: 15px; overflow-x: auto; color: #00ff00; font-family: monospace; font-size: 14px; white-space: pre-wrap; word-wrap: break-word;}
+        .copy-btn { position: absolute; top: 5px; right: 5px; background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: var(--accent); }
+        .note { background: rgba(233, 69, 96, 0.1); border-left: 4px solid var(--accent); padding: 10px 15px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">🖥️ Desktop Guide</a>
+        <a href="android.html">📱 Android Guide</a>
+    </nav>
+
+    <div class="container">
+        <h1>Tauri Masterclass: Build & Sign Android Apps</h1>
+        <p>Take your web application and compile it into a fully native Android APK. We will cover the "True Dev" method of manually aligning and signing the APK from the terminal to avoid Android Studio bugs.</p>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#prereq">1. Android Prerequisites</a></li>
+                <li><a href="#init">2. Initialize & Test on Phone</a></li>
+                <li><a href="#build">3. Build the Unsigned Release</a></li>
+                <li><a href="#sign">4. Manual Signing Process (The True Dev Way)</a></li>
+            </ul>
+        </div>
+
+        <h2 id="prereq">1. Android Prerequisites</h2>
+        <p>Before adding Android to your Tauri project, you need the mobile SDKs and Rust targets.</p>
+        <ol>
+            <li>Install <strong>Android Studio</strong> (Ensure SDK and NDK are installed via SDK Manager).</li>
+            <li>Add Rust Mobile Targets by running this in your terminal:</li>
+        </ol>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android</code></pre>
+        </div>
+
+        <h2 id="init">2. Initialize & Test on Phone</h2>
+        <p>Navigate to your existing Tauri project folder. Inject the Android native files by running:</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm run tauri android init</code></pre>
+        </div>
+        <p>To test the app live on your physical Android phone, plug it in via USB (ensure USB Debugging is ON) and run:</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm run tauri android dev</code></pre>
+        </div>
+
+        <h2 id="build">3. Build the Unsigned Release</h2>
+        <p>To generate the highly optimized APK file for production, run the build command:</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm run tauri android build</code></pre>
+        </div>
+        <div class="note"><strong>Result:</strong> Your raw, unsigned APK is located at: <code>src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk</code></div>
+
+        <h2 id="sign">4. Manual Signing Process (The True Dev Way)</h2>
+        <p>Modern Android phones (Android 11+) reject basic signatures. We must use the official SDK tools (zipalign and apksigner) to apply a strict V2 Signature. <em>(Replace paths below with your actual Windows username/paths).</em></p>
+
+        <h3>Step 4.1: Generate a Keystore (One-Time Only)</h3>
+        <p>Run this tool (which comes with Android Studio's JBR) to create your digital identity. Note the <code>C=TZ</code> stands for Tanzania!</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>"C:\Program Files\Android\Android Studio\jbr\bin\keytool" -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias -storepass 123456 -keypass 123456 -dname "CN=Dev, OU=Personal, O=Personal, L=Unknown, ST=Unknown, C=TZ"</code></pre>
+        </div>
+
+        <h3>Step 4.2: Set JAVA_HOME</h3>
+        <p>The signing tools require Java. Point your terminal to Android Studio's bundled Java:</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>set JAVA_HOME=C:\Program Files\Android\Android Studio\jbr</code></pre>
+        </div>
+
+        <h3>Step 4.3: Zipalign the APK</h3>
+        <p>This rearranges the APK's memory footprint so Android can read it efficiently. <em>(Make sure you change the path to your actual SDK build-tools folder version).</em></p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>"C:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk\build-tools\34.0.0\zipalign.exe" -f -v -p 4 "src-tauri\gen\android\app\build\outputs\apk\universal\release\app-universal-release-unsigned.apk" app-aligned.apk</code></pre>
+        </div>
+
+        <h3>Step 4.4: Sign the APK</h3>
+        <p>Finally, apply the V2 signature using apksigner. This creates your final, shareable app!</p>
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>"C:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk\build-tools\34.0.0\apksigner.bat" sign --ks my-release-key.jks --ks-key-alias my-key-alias --ks-pass pass:123456 --key-pass pass:123456 --out my-final-app.apk app-aligned.apk</code></pre>
+        </div>
+
+        <div class="note"><strong>Success!</strong> You now have a file named <code>my-final-app.apk</code> in your project folder. Transfer it to your phone and install it flawlessly!</div>
+
+    </div>
+
+    <script>
+        function copyCode(btn) {
+            const code = btn.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
