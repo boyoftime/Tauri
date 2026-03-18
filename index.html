@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tauri Masterclass: Desktop to Mobile</title>
+    <style>
+        :root { --bg: #1a1a2e; --surface: #16213e; --primary: #0f3460; --accent: #e94560; --text: #e0e0e0; }
+        body { font-family: system-ui, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 0; }
+        nav { background-color: var(--surface); padding: 1rem 2rem; border-bottom: 2px solid var(--accent); display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; font-size: 1.1rem; }
+        nav a:hover { color: var(--accent); }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 20px; }
+        h1, h2, h3 { color: #fff; }
+        h1 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .toc { background: var(--surface); padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .toc ul { list-style-type: none; padding-left: 0; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { color: var(--accent); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .code-wrapper { position: relative; background: #000; border-radius: 8px; margin: 15px 0; overflow: hidden; }
+        pre { margin: 0; padding: 15px; overflow-x: auto; color: #00ff00; font-family: monospace; font-size: 14px; }
+        .copy-btn { position: absolute; top: 5px; right: 5px; background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: var(--accent); }
+        .note { background: rgba(233, 69, 96, 0.1); border-left: 4px solid var(--accent); padding: 10px 15px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">🖥️ Desktop Guide</a>
+        <a href="android.html">📱 Android Guide</a>
+    </nav>
+
+    <div class="container">
+        <h1>Tauri Masterclass: Build Native Desktop Apps</h1>
+        <p>Welcome to the ultimate beginner's guide to Tauri. Learn how to build blazing fast, ultra-lightweight desktop applications using standard web technologies (HTML, CSS, JavaScript).</p>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#prereq">1. Prerequisites & Installation</a></li>
+                <li><a href="#create">2. Creating Your First Project</a></li>
+                <li><a href="#dev">3. Running in Development Mode</a></li>
+                <li><a href="#build">4. Building the Final Release (.exe & .msi)</a></li>
+                <li><a href="#portable">5. Creating a Portable App</a></li>
+            </ul>
+        </div>
+
+        <h2 id="prereq">1. Prerequisites & Installation</h2>
+        <p>Before building a native app, your computer needs the right tools installed. Do this once, and you are set forever.</p>
+        <ol>
+            <li><strong>Node.js:</strong> Download and install from nodejs.org.</li>
+            <li><strong>Rust:</strong> Download and install rustup from rustup.rs.</li>
+            <li><strong>Microsoft C++ Build Tools (Crucial for Windows):</strong>
+                <ul>
+                    <li>Download the Visual Studio Installer.</li>
+                    <li>Select <strong>"Desktop development with C++"</strong>.</li>
+                    <li><em>Pro-tip to save space:</em> Uncheck everything on the right side EXCEPT <code>MSVC v143...</code> and <code>Windows 11 SDK</code>. This reduces the download from 7GB to roughly 2GB!</li>
+                </ul>
+            </li>
+        </ol>
+        <div class="note"><strong>Important:</strong> After installing these tools, you MUST restart your command prompt or terminal!</div>
+
+        <h2 id="create">2. Creating Your First Project</h2>
+        <p>Open your terminal and run the command to scaffold a new Tauri app. We will use Vanilla JavaScript for simplicity.</p>
+        
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm create tauri-app@latest my-app</code></pre>
+        </div>
+        <p>Follow the prompts: Choose <strong>npm</strong> -> <strong>Vanilla</strong> -> <strong>JavaScript</strong>. Once created, navigate into the folder and install dependencies:</p>
+        
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>cd my-app
+npm install</code></pre>
+        </div>
+
+        <h2 id="dev">3. Running in Development Mode</h2>
+        <p>To see your app live and test the sample template, run the development server. The first time you run this, Rust will take a few minutes to download and compile core libraries. Future runs will be instant.</p>
+        
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm run tauri dev</code></pre>
+        </div>
+        <p>A native desktop window will appear showing the default Tauri template. Any changes you make to the <code>src/index.html</code> file will instantly update the app!</p>
+
+        <h2 id="build">4. Building the Final Release</h2>
+        <p>When you are ready to share your app with the world, it is time to build the highly optimized, tiny executable file.</p>
+        
+        <div class="code-wrapper">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre><code>npm run tauri build</code></pre>
+        </div>
+        <p>Once finished, you can find your final applications here:</p>
+        <ul>
+            <li><strong>The .exe file:</strong> <code>src-tauri/target/release/my-app.exe</code> (Usually under 10MB!)</li>
+            <li><strong>The .msi Installer:</strong> <code>src-tauri/target/release/bundle/msi/</code> (A professional setup wizard for your users).</li>
+        </ul>
+
+        <h2 id="portable">5. Creating a Portable App</h2>
+        <p>Want an app that runs directly from a USB drive without installation?</p>
+        <ol>
+            <li>Create an empty folder on your Desktop.</li>
+            <li>Go to <code>src-tauri/target/release/</code></li>
+            <li>Copy <strong>my-app.exe</strong> and <strong>WebView2Loader.dll</strong> into your new folder.</li>
+            <li>That's it! You can ZIP this folder and run the app anywhere.</li>
+        </ol>
+
+    </div>
+
+    <script>
+        function copyCode(btn) {
+            const code = btn.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
